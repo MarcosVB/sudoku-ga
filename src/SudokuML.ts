@@ -7,6 +7,7 @@ export class SudokuML {
   constructor(
     private readonly board: Board,
     private readonly populationSize: number,
+    private readonly generations: number,
     private readonly mutationRate: number
   ) {
     this.population = [];
@@ -15,7 +16,7 @@ export class SudokuML {
   public run() {
     let generation = 1;
     this.populate();
-    while (!this.evaluate()) {
+    do {
       this.select();
       this.repopulate();
       this.mutate();
@@ -24,7 +25,7 @@ export class SudokuML {
           this.population.map((a) => a.validate())[0]
         }, Population size: ${this.population.length}`
       );
-    }
+    } while (generation !== this.generations + 1 && !this.evaluate());
     console.log(JSON.stringify(this.evaluate()));
   }
 
