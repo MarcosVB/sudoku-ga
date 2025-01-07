@@ -1,34 +1,10 @@
+import { Board } from "./Board";
+
 export class Sudoku {
-  protected board: number[][];
-
-  constructor() {
-    this.board = this.createBoard();
-  }
-
-  public setBoard(board: number[][]) {
-    this.board = board;
-  }
+  constructor(private readonly board: Board) {}
 
   public getBoard() {
     return this.board;
-  }
-
-  private createBoard(): number[][] {
-    return [
-      this.createRow(),
-      this.createRow(),
-      this.createRow(),
-      this.createRow(),
-      this.createRow(),
-      this.createRow(),
-      this.createRow(),
-      this.createRow(),
-      this.createRow(),
-    ];
-  }
-
-  private createRow(): number[] {
-    return [1, 2, 3, 4, 5, 6, 7, 8, 9].sort(() => Math.random() - 0.5);
   }
 
   public validate() {
@@ -37,10 +13,10 @@ export class Sudoku {
 
   private validateColumns(): number {
     let inconsistencies = 0;
-    for (let i = 0; i < this.board.length; i++) {
+    for (let i = 0; i < this.board.getSize(); i++) {
       const column: number[] = [];
-      for (let j = 0; j < this.board[i].length; j++) {
-        column.push(this.board[j][i]);
+      for (let j = 0; j < this.board.getRow(i).getSize(); j++) {
+        column.push(this.board.getRow(j).getNumber(i));
       }
       inconsistencies += 9 - new Set(column).size;
     }
@@ -54,7 +30,7 @@ export class Sudoku {
         const grid: number[] = [];
         for (let i = 0; i < 3; i++) {
           for (let j = 0; j < 3; j++) {
-            grid.push(this.board[row + i][column + j]);
+            grid.push(this.board.getRow(row + i).getNumber(column + j));
           }
         }
         inconsistencies += 9 - new Set(grid).size;

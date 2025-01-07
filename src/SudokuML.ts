@@ -1,9 +1,11 @@
+import { Board } from "./Board";
 import { Sudoku } from "./Sudoku";
 
 export class SudokuML {
   private readonly population: Sudoku[];
 
   constructor(
+    private readonly board: Board,
     private readonly populationSize: number,
     private readonly mutationRate: number
   ) {
@@ -28,7 +30,7 @@ export class SudokuML {
 
   private populate() {
     while (this.population.length < this.populationSize) {
-      this.population.push(new Sudoku());
+      this.population.push(new Sudoku(this.board));
     }
   }
 
@@ -40,14 +42,9 @@ export class SudokuML {
       this.populationSize
     ) {
       const sudoku = this.population[i % this.population.length];
-      const newSudoku = new Sudoku();
-      newSudoku.setBoard(JSON.parse(JSON.stringify(sudoku.getBoard())));
-      const row = Math.floor(Math.random() * sudoku.getBoard().length);
-      this.swap(
-        sudoku.getBoard()[row],
-        Math.floor(Math.random() * sudoku.getBoard()[row].length),
-        Math.floor(Math.random() * sudoku.getBoard()[row].length)
-      );
+      const newSudoku = new Sudoku(this.board);
+      const row = Math.floor(Math.random() * sudoku.getBoard().getSize());
+      sudoku.getBoard().getRow(row).swap();
       newPopulation.push(newSudoku);
       i++;
     }
@@ -70,25 +67,18 @@ export class SudokuML {
 
   private mutate() {
     this.population.forEach((sudoku) => {
-      sudoku.getBoard().forEach((row) => {
-        if (Math.random() < this.mutationRate) {
-          this.swap(
-            row,
-            Math.floor(Math.random() * row.length),
-            Math.floor(Math.random() * row.length)
-          );
-        }
-      });
+      sudoku
+        .getBoard()
+        .getRows()
+        .forEach((row) => {
+          if (Math.random() < this.mutationRate) {
+            row.swap();
+          }
+        });
     });
   }
 
   private evaluate() {
     return this.population.find((sudoku) => sudoku.validate() === 0);
-  }
-
-  private swap(row: number[], a: number, b: number) {
-    const temp = row[a];
-    row[a] = row[b];
-    row[b] = temp;
   }
 }
