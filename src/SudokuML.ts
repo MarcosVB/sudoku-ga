@@ -30,7 +30,7 @@ export class SudokuML {
 
   private populate() {
     while (this.population.length < this.populationSize) {
-      this.population.push(new Sudoku(this.board));
+      this.population.push(new Sudoku(this.board.clone()));
     }
   }
 
@@ -42,7 +42,7 @@ export class SudokuML {
       this.populationSize
     ) {
       const sudoku = this.population[i % this.population.length];
-      const newSudoku = new Sudoku(this.board);
+      const newSudoku = new Sudoku(this.board.clone());
       const row = Math.floor(Math.random() * sudoku.getBoard().getSize());
       sudoku.getBoard().getRow(row).swap();
       newPopulation.push(newSudoku);

@@ -48,4 +48,10 @@ export class Row {
     this.row[base] = this.row[target];
     this.row[target] = temp;
   }
+
+  public clone() {
+    return new Row(
+      this.row.map((value, index) => (this.isFixed(index) ? value : 0))
+    );
+  }
 }

@@ -18,4 +18,8 @@ export class Board {
   public getRows() {
     return this.rows;
   }
+
+  public clone() {
+    return new Board(this.rows.map((row) => row.clone()));
+  }
 }
