@@ -20,12 +20,12 @@ export class SudokuML {
       this.select();
       this.repopulate();
       this.mutate();
-      console.log(
-        `Generation: ${generation++}, Best fitness: ${
-          this.population.map((a) => a.validate())[0]
-        }, Population size: ${this.population.length}`
-      );
-    } while (generation !== this.generations + 1 && !this.evaluate());
+      this.sort();
+      this.log(generation++);
+    } while (
+      generation !== this.generations + 1 &&
+      this.population.at(0)!.validate() !== 0
+    );
     console.log(JSON.stringify(this.evaluate()));
   }
 
@@ -53,8 +53,12 @@ export class SudokuML {
   }
 
   private select() {
-    this.population.sort(this.compare);
+    this.sort();
     this.population.splice(this.population.length / 2);
+  }
+
+  private sort() {
+    this.population.sort(this.compare);
   }
 
   private compare(base: Sudoku, target: Sudoku) {
@@ -81,5 +85,16 @@ export class SudokuML {
 
   private evaluate() {
     return this.population.find((sudoku) => sudoku.validate() === 0);
+  }
+
+  private log(generation: number) {
+    console.log(
+      [
+        `generation: ${generation}`,
+        `population: ${this.population.length}`,
+        `best_fitness: ${this.population.at(0)!.validate()}`,
+        `worst_fitness: ${this.population.at(-1)!.validate()}`,
+      ].join(", ")
+    );
   }
 }
