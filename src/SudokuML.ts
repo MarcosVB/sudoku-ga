@@ -43,7 +43,7 @@ export class SudokuML {
       this.populationSize
     ) {
       const sudoku = this.population[i % this.population.length];
-      const newSudoku = new Sudoku(this.board.clone());
+      const newSudoku = new Sudoku(sudoku.getBoard().clone());
       const row = Math.floor(Math.random() * sudoku.getBoard().getSize());
       newSudoku.getBoard().getRow(row).swap();
       newPopulation.push(newSudoku);
