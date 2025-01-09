@@ -11,5 +11,9 @@ const board: number[][] = [
   [0, 7, 0, 0, 0, 0, 0, 6, 0],
   [0, 0, 0, 3, 0, 4, 0, 0, 0],
 ];
-const sudokuML = new SudokuML(board, 1000, 1000, 0.01);
+const sudokuML = new SudokuML(board, {
+  populationSize: 1000,
+  generations: 400,
+  mutationRate: 0.01,
+});
 sudokuML.run();

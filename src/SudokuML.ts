@@ -3,30 +3,43 @@ import { Row } from "./Row";
 import { Sudoku } from "./Sudoku";
 
 export class SudokuML {
+  private readonly generations: number;
+  private readonly mutationRate: number;
   private readonly population: Sudoku[];
+  private readonly populationSize: number;
+  private generation: number;
 
   constructor(
     private readonly board: number[][],
-    private readonly populationSize: number,
-    private readonly generations: number,
-    private readonly mutationRate: number
+    {
+      generations = Infinity,
+      mutationRate,
+      populationSize,
+    }: {
+      generations?: number;
+      mutationRate: number;
+      populationSize: number;
+    }
   ) {
+    this.generation = 1;
+    this.generations = generations;
+    this.mutationRate = mutationRate;
     this.population = [];
+    this.populationSize = populationSize;
   }
 
   public run() {
-    let generation = 1;
     this.populate();
-    do {
+    while (
+      this.generation <= this.generations &&
+      this.population.at(0)!.validate() !== 0
+    ) {
       this.select();
       this.repopulate();
       this.mutate();
       this.sort();
-      this.log(generation++);
-    } while (
-      generation !== this.generations + 1 &&
-      this.population.at(0)!.validate() !== 0
-    );
+      this.log(this.generation++);
+    }
     console.log(JSON.stringify(this.evaluate()?.getBoard().toString()));
   }
 
@@ -93,11 +106,15 @@ export class SudokuML {
   private log(generation: number) {
     console.log(
       [
-        `generation: ${generation}`,
-        `population: ${this.population.length}`,
-        `best_fitness: ${this.population.at(0)!.validate()}`,
-        `worst_fitness: ${this.population.at(-1)!.validate()}`,
-      ].join(", ")
+        "{",
+        [
+          `"generation":${generation}`,
+          `"population":${this.population.length}`,
+          `"best_fitness":${this.population.at(0)!.validate()}`,
+          `"worst_fitness":${this.population.at(-1)!.validate()}`,
+        ].join(","),
+        "}",
+      ].join("")
     );
   }
 }
