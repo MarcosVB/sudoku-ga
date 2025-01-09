@@ -1,11 +1,12 @@
 import { Board } from "./Board";
+import { Row } from "./Row";
 import { Sudoku } from "./Sudoku";
 
 export class SudokuML {
   private readonly population: Sudoku[];
 
   constructor(
-    private readonly board: Board,
+    private readonly board: number[][],
     private readonly populationSize: number,
     private readonly generations: number,
     private readonly mutationRate: number
@@ -31,7 +32,9 @@ export class SudokuML {
 
   private populate() {
     while (this.population.length < this.populationSize) {
-      this.population.push(new Sudoku(this.board.clone()));
+      this.population.push(
+        new Sudoku(new Board(this.board.map((row) => new Row([...row]))))
+      );
     }
   }
 
