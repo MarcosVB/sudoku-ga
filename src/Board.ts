@@ -22,4 +22,8 @@ export class Board {
   public clone() {
     return new Board(this.rows.map((row) => row.clone()));
   }
+
+  public toString() {
+    return "[" + this.rows.map((row) => row.toString()) + "]";
+  }
 }

@@ -48,4 +48,8 @@ export class Row {
   public clone() {
     return new Row([...this.row], new Set([...this.fixed]));
   }
+
+  public toString() {
+    return JSON.stringify(this.row);
+  }
 }

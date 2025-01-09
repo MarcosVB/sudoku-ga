@@ -26,7 +26,7 @@ export class SudokuML {
       generation !== this.generations + 1 &&
       this.population.at(0)!.validate() !== 0
     );
-    console.log(JSON.stringify(this.evaluate()));
+    console.log(JSON.stringify(this.evaluate()?.getBoard().toString()));
   }
 
   private populate() {
