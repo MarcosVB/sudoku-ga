@@ -23,6 +23,10 @@ export class Row {
     });
   }
 
+  public getRow() {
+    return this.row;
+  }
+
   public getSize() {
     return this.row.length;
   }

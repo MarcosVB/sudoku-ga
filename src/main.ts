@@ -12,8 +12,9 @@ const board: number[][] = [
   [0, 0, 0, 3, 0, 4, 0, 0, 0],
 ];
 const sudokuML = new SudokuML(board, {
-  populationSize: 1000,
-  generations: 400,
-  mutationRate: 0.01,
+  populationSize: 100,
+  iterations: 10000,
+  mutationRate: 0.00,
 });
-sudokuML.run();
+const solution = sudokuML.run();
+console.log(JSON.stringify(solution));

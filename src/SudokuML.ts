@@ -3,26 +3,36 @@ import { Row } from "./Row";
 import { Sudoku } from "./Sudoku";
 
 export class SudokuML {
-  private readonly generations: number;
+  private generation: number;
+  private iteration: number;
+  private readonly iterations: number;
+  private readonly logs: Array<{
+    best_fitness: number;
+    generation: number;
+    iteration: number;
+    mutationRate: number;
+    worst_fitness: number;
+  }>;
   private readonly mutationRate: number;
   private readonly population: Sudoku[];
   private readonly populationSize: number;
-  private generation: number;
 
   constructor(
     private readonly board: number[][],
     {
-      generations = Infinity,
+      iterations = Infinity,
       mutationRate,
       populationSize,
     }: {
-      generations?: number;
+      iterations?: number;
       mutationRate: number;
       populationSize: number;
     }
   ) {
     this.generation = 1;
-    this.generations = generations;
+    this.iteration = 1;
+    this.iterations = iterations;
+    this.logs = [];
     this.mutationRate = mutationRate;
     this.population = [];
     this.populationSize = populationSize;
@@ -31,16 +41,23 @@ export class SudokuML {
   public run() {
     this.populate();
     while (
-      this.generation <= this.generations &&
+      this.iteration <= this.iterations &&
       this.population.at(0)!.validate() !== 0
     ) {
+      this.handleStagnation();
       this.select();
-      this.repopulate();
+      this.replicate();
       this.mutate();
       this.sort();
-      this.log(this.generation++);
+      this.log();
+      this.generation++;
+      this.iteration++;
     }
-    console.log(JSON.stringify(this.evaluate()?.getBoard().toString()));
+    this.print();
+    return this.evaluate()
+      ?.getBoard()
+      .getRows()
+      .map((row) => [...row.getRow()]);
   }
 
   private populate() {
@@ -51,7 +68,7 @@ export class SudokuML {
     }
   }
 
-  private repopulate() {
+  private replicate() {
     const newPopulation: Sudoku[] = [];
     let i = 0;
     while (
@@ -66,6 +83,19 @@ export class SudokuML {
       i++;
     }
     this.population.push(...newPopulation);
+  }
+
+  private handleStagnation() {
+    if (
+      this.iteration % 100 !== 0 ||
+      new Set(this.logs.slice(-100).map((log) => log.best_fitness)).size > 1
+    ) {
+      return;
+    }
+    this.print();
+    this.population.splice(0);
+    this.populate();
+    this.generation = 1;
   }
 
   private select() {
@@ -103,15 +133,27 @@ export class SudokuML {
     return this.population.find((sudoku) => sudoku.validate() === 0);
   }
 
-  private log(generation: number) {
+  private log() {
+    this.logs.push({
+      best_fitness: this.population.at(0)!.validate(),
+      generation: this.generation,
+      iteration: this.iteration,
+      mutationRate: this.mutationRate,
+      worst_fitness: this.population.at(-1)!.validate(),
+    });
+  }
+
+  private print() {
     console.log(
       [
         "{",
         [
-          `"generation":${generation}`,
-          `"population":${this.population.length}`,
-          `"best_fitness":${this.population.at(0)!.validate()}`,
-          `"worst_fitness":${this.population.at(-1)!.validate()}`,
+          `"iteration":${this.logs.at(-1)?.iteration}`,
+          `"generation":${this.logs.at(-1)?.generation}`,
+          `"size":${this.population.length}`,
+          `"best_fitness":${this.logs.at(-1)?.best_fitness}`,
+          `"worst_fitness":${this.logs.at(-1)?.worst_fitness}`,
+          `"mutation_rate":${this.logs.at(-1)?.mutationRate}`,
         ].join(","),
         "}",
       ].join("")
